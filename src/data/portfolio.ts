@@ -502,8 +502,8 @@ export const projects: Project[] = [
     category: "Java / Game Development",
     description:
       "Built a Java 21 Swing Tic-Tac-Toe application with an immutable game-state model, unbeatable Minimax AI with alpha-beta pruning, MVC architecture, asynchronous AI computation, and exhaustive game-tree verification.",
-    repo: "https://github.com/prathik-05/tic-tac-toe-minimax",
-    github: "https://github.com/prathik-05/tic-tac-toe-minimax",
+    repo: "https://github.com/prathik-05/Tic-Tac-Toe-with-Minimax-AI",
+    github: "https://github.com/prathik-05/Tic-Tac-Toe-with-Minimax-AI",
     live: "",
     slug: "tic-tac-toe-minimax",
     status: "Completed · 47 Tests Passing",
