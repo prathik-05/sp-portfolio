@@ -1,0 +1,420 @@
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { motion, useInView } from "framer-motion";
+import { ArrowRight, FileText } from "lucide-react";
+import { THEMES } from "@/lib/themes";
+import { useSPDev } from "@/context/spdev-provider";
+import { TendrilBorder } from "@/components/effects/tendril-border";
+import { ResumeViewer } from "@/components/resume/resume-viewer";
+import { certifications } from "@/data/certifications";
+import { projects } from "@/data/portfolio";
+import { cn } from "@/lib/utils";
+
+/** Bounded internal scroll range for Card 1 (~13vh of physical depth). */
+const SCROLL_RATIO = 0.13;
+
+function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let raf = 0;
+    const start = performance.now();
+    const duration = 900;
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplay(Math.round(eased * value));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, value]);
+
+  return (
+    <span ref={ref}>
+      {String(display).padStart(2, "0")}
+      {suffix}
+    </span>
+  );
+}
+
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
+
+export function Hero() {
+  const { themeMode, shootWebAt, setCard, reducedMotion, currentCard } = useSPDev();
+  const theme = THEMES[themeMode];
+  const isVenom = themeMode === "venom";
+
+  const rootRef = useRef<HTMLElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const bgRef = useRef<HTMLDivElement | null>(null);
+  const titleRef = useRef<HTMLDivElement | null>(null);
+  const imageRef = useRef<HTMLDivElement | null>(null);
+  const statsRef = useRef<HTMLDivElement | null>(null);
+  const targetRef = useRef(0);
+  const currentRef = useRef(0);
+  const rafRef = useRef(0);
+
+  const [maxScroll, setMaxScroll] = useState(0);
+
+  // Measure the bounded scroll range once, and again on resize.
+  useEffect(() => {
+    const measure = () => setMaxScroll(Math.round(window.innerHeight * SCROLL_RATIO));
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  // Internal, self-contained scroll: Lenis is stopped on Card 1 (it calls
+  // preventDefault), so we drive the movement ourselves via wheel/touch.
+  useEffect(() => {
+    if (reducedMotion || currentCard !== 1) {
+      targetRef.current = 0;
+      currentRef.current = 0;
+      applyTransforms(0);
+      return;
+    }
+
+    const root = rootRef.current;
+    if (!root) return;
+
+    let touchStartY = 0;
+    let touchStartTarget = 0;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      targetRef.current = clamp(targetRef.current + e.deltaY, 0, maxScroll);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+      touchStartTarget = targetRef.current;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const dy = touchStartY - e.touches[0].clientY;
+      targetRef.current = clamp(touchStartTarget + dy, 0, maxScroll);
+    };
+
+    const onTouchEnd = () => {
+      // Nothing to do — spring is handled by the lerp loop below.
+    };
+
+    root.addEventListener("wheel", onWheel, { passive: false });
+    root.addEventListener("touchstart", onTouchStart, { passive: true });
+    root.addEventListener("touchmove", onTouchMove, { passive: true });
+    root.addEventListener("touchend", onTouchEnd, { passive: true });
+
+    const tick = () => {
+      const target = targetRef.current;
+      currentRef.current += (target - currentRef.current) * 0.14;
+      if (Math.abs(target - currentRef.current) < 0.1) currentRef.current = target;
+      applyTransforms(currentRef.current);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      root.removeEventListener("wheel", onWheel);
+      root.removeEventListener("touchstart", onTouchStart);
+      root.removeEventListener("touchmove", onTouchMove);
+      root.removeEventListener("touchend", onTouchEnd);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [reducedMotion, currentCard, maxScroll]);
+
+  // Apply the bounded offset plus per-layer parallax via direct style writes.
+  const applyTransforms = (c: number) => {
+    if (contentRef.current) {
+      contentRef.current.style.transform = `translate3d(0, ${-c}px, 0)`;
+    }
+    // Background artwork drifts slower than the foreground (0.5x).
+    if (bgRef.current) {
+      bgRef.current.style.transform = `translate3d(0, ${-c * 0.5}px, 0)`;
+    }
+    // Title trails slightly behind (0.82x net), image leads (1.18x net),
+    // stats stay nearly still (0.96x net) — subtle physical depth.
+    if (titleRef.current) {
+      titleRef.current.style.transform = `translate3d(0, ${c * 0.18}px, 0)`;
+    }
+    if (imageRef.current) {
+      imageRef.current.style.transform = `translate3d(0, ${-c * 0.18}px, 0)`;
+    }
+    if (statsRef.current) {
+      statsRef.current.style.transform = `translate3d(0, ${c * 0.04}px, 0)`;
+    }
+  };
+
+  const handleUnlockClick = (e: React.MouseEvent) => {
+    shootWebAt(e.currentTarget as HTMLElement);
+    setCard(2);
+  };
+
+  return (
+    <section
+      ref={rootRef}
+      className="relative h-screen w-full overflow-hidden overscroll-contain bg-[var(--theme-bg)] transition-colors duration-500"
+      style={{ touchAction: "pan-y" }}
+    >
+      {/* Ambient backdrop — drifts slower than content (0.5x parallax). */}
+      <div ref={bgRef} className="absolute inset-0 z-0 will-change-transform">
+        <Image
+          src={themeMode === "venom" ? "/images/venom.jpg" : "/images/spp.jpg"}
+          alt={themeMode === "venom" ? "Venom background" : "Hero background"}
+          fill
+          priority
+          sizes="100vw"
+          className={cn(
+            "object-cover object-center",
+            themeMode === "venom" ? "opacity-40" : "opacity-30"
+          )}
+        />
+        <div
+          className={cn(
+            "absolute inset-0",
+            themeMode === "venom"
+              ? "bg-gradient-to-b from-black/85 via-black/60 to-black/95"
+              : "bg-gradient-to-b from-black/70 via-black/45 to-black/90"
+          )}
+        />
+        {/* Atmospheric tint — crimson in Classic, cool silver in Venom. */}
+        <div
+          className={cn(
+            "absolute inset-0 mix-blend-screen",
+            themeMode === "venom"
+              ? "bg-[radial-gradient(circle_at_30%_20%,rgba(199,203,209,0.10),transparent_55%)]"
+              : "bg-[radial-gradient(circle_at_25%_25%,rgba(229,9,20,0.16),transparent_60%)]"
+          )}
+        />
+      </div>
+
+      {/* Soft suit glow pool behind the content (subtle, not dashboard-like). */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[68vh] w-[60vw] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background: "radial-gradient(circle, var(--suit-glow) 0%, transparent 66%)"
+        }}
+      />
+
+      {/* Scrollable stage: 100vh hero + a ~13vh continuation strip. */}
+      <div
+        ref={contentRef}
+        className="relative z-10 will-change-transform"
+        style={{ height: `calc(100% + ${maxScroll}px)` }}
+      >
+        {/* Main hero composition */}
+        <div className="flex min-h-screen flex-col justify-center px-6 pt-24 pb-16 sm:px-10 lg:px-16">
+          <div className="mx-auto grid w-full max-w-[1280px] items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+            {/* Left: Editorial identity */}
+            <div ref={titleRef} className="will-change-transform">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-8"
+              >
+                {/* Minimal status line — no boxy chip. */}
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 rounded-full bg-[var(--suit-success)]" />
+                  <p className="font-mono text-[11px] font-medium tracking-[0.22em] text-slate-400 uppercase">
+                    {themeMode === "venom"
+                      ? "Symbiote protocol // ready"
+                      : "Open for opportunities"}
+                  </p>
+                </div>
+
+                {/* Typography */}
+                <div className="space-y-5">
+                  <h1
+                    data-text={`${theme.copy.heroTitleFirst} ${theme.copy.heroTitleLast}`}
+                    className="venom-glitch-text classic-pop-title font-display-aggressive text-[clamp(3.2rem,8vw,7.5rem)] font-bold leading-[0.9] tracking-tight text-white"
+                    style={{ fontFamily: "var(--font-display-aggressive)" }}
+                  >
+                    {theme.copy.heroTitleFirst}{" "}
+                    <span className="text-[var(--suit-accent)]">
+                      {theme.copy.heroTitleLast}
+                    </span>
+                  </h1>
+                  <div className="flex items-center gap-4">
+                    <span className="h-px w-10 bg-[var(--suit-accent)]/50" />
+                    <p className="font-mono text-xs sm:text-sm font-semibold tracking-[0.24em] text-slate-300 uppercase">
+                      {theme.copy.heroRole}
+                    </p>
+                  </div>
+                  <p className="max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
+                    {theme.copy.heroTagline}
+                  </p>
+                </div>
+
+                {/* CTA group */}
+                <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center">
+                  <button
+                    onClick={handleUnlockClick}
+                    aria-label="View Full Portfolio"
+                    className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-[var(--suit-accent)] px-8 py-4 text-sm font-semibold text-[var(--suit-accent-ink)] shadow-lg shadow-[var(--suit-glow)] transition-all duration-300 hover:scale-[1.02] hover:opacity-95 active:scale-[0.98]"
+                  >
+                    <TendrilBorder />
+                    <span>{theme.copy.unlockLabel}</span>
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </button>
+
+                  <ResumeViewer
+                    trigger={
+                      <span className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-6 py-4 text-sm font-medium text-slate-200 transition-all hover:border-white/25 hover:bg-white/[0.08] hover:text-white">
+                        <FileText className="h-4 w-4 text-[var(--suit-accent)]" />
+                        View Résumé
+                      </span>
+                    }
+                  />
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right: Cinematic showcase — no rigid dashboard frame. */}
+            <motion.div
+              ref={imageRef}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.9,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.15
+              }}
+              className="relative will-change-transform"
+            >
+              <div className="relative mx-auto w-full max-w-[460px]">
+                {/* Atmospheric glow bleeding out from the character. */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-10 rounded-full opacity-70 blur-2xl"
+                  style={{
+                    background:
+                      themeMode === "venom"
+                        ? "radial-gradient(circle, rgba(199,203,209,0.2), transparent 65%)"
+                        : "radial-gradient(circle, rgba(229,9,20,0.3), transparent 65%)"
+                  }}
+                />
+
+                {/* Premium framed panel — generous padding, refined border, corner accents. */}
+                <div className="relative rounded-[2rem] border border-white/12 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-2.5 shadow-2xl shadow-black/60 backdrop-blur-xl">
+                  {/* Corner web accents */}
+                  <svg
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute -left-3 -top-3 h-7 w-7",
+                      isVenom ? "text-white" : "text-[var(--suit-accent)]"
+                    )}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                  >
+                    <path d="M2 22 L22 2 M6 22 L22 6 M10 22 L22 10 M14 22 L22 14 M2 18 L18 2 M2 14 L14 2" />
+                  </svg>
+                  <svg
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute -bottom-3 -right-3 h-7 w-7",
+                      isVenom ? "text-white" : "text-[var(--suit-accent)]"
+                    )}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                  >
+                    <path d="M2 22 L22 2 M6 22 L22 6 M10 22 L22 10 M14 22 L22 14 M2 18 L18 2 M2 14 L14 2" />
+                  </svg>
+
+                  <div className="relative aspect-[4/5] min-h-[440px] sm:min-h-[480px] w-full overflow-hidden rounded-[1.5rem]">
+                    <Image
+                      src={themeMode === "venom" ? "/images/v.jpg" : "/images/spchest.jpg"}
+                      alt="Hero showcase"
+                      fill
+                      priority
+                      sizes="(max-width: 768px) 100vw, 460px"
+                      className={cn(
+                        "object-cover",
+                        themeMode === "venom" ? "object-top" : "object-center"
+                      )}
+                    />
+                    {/* Panel header strip */}
+                    <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300 bg-gradient-to-b from-black/60 to-transparent">
+                      <span className="text-[var(--suit-accent)]">
+                        {themeMode === "venom" ? "Symbiote // Black Suit" : "Identity // Core Mark"}
+                      </span>
+                      <span className="text-slate-400">v2.5 Ready</span>
+                    </div>
+                    {/* Legibility grade at the base. */}
+                    <div className="absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-black/85 to-transparent pointer-events-none" />
+
+                    {/* Quote caption. */}
+                    <div className="absolute bottom-5 left-5 right-5 z-10 space-y-1.5">
+                      <p className="text-sm italic leading-snug text-slate-200">
+                        &ldquo;{theme.copy.heroQuote}&rdquo;
+                      </p>
+                      <p className="text-xs font-semibold tracking-wide text-[var(--suit-accent)]">
+                        {theme.copy.heroQuoteAuthor}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Continuation strip — editorial facts + scroll cue. Still Card 1. */}
+        <div
+          ref={statsRef}
+          style={{ height: maxScroll }}
+          className="flex items-center border-t border-white/6 px-6 sm:px-10 lg:px-16 will-change-transform"
+        >
+          <div className="mx-auto grid w-full max-w-[1280px] gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+            {/* Editorial stats row — subtle dividers instead of dashboard boxes. */}
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:divide-x sm:divide-white/10">
+              <div className="sm:pr-8">
+                <p className="font-display text-2xl font-bold text-white">
+                  <CountUp value={projects.length} />
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                  Flagship projects
+                </p>
+              </div>
+              <div className="sm:px-8">
+                <p className="font-display text-2xl font-bold text-[var(--suit-accent)]">
+                  YOLOv11
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                  Computer vision
+                </p>
+              </div>
+              <div className="sm:px-8">
+                <p className="font-display text-2xl font-bold text-white">
+                  <CountUp value={certifications.length} suffix="+" />
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                  Certifications
+                </p>
+              </div>
+            </div>
+
+            {/* Scroll cue */}
+            <div className="hidden items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 lg:flex">
+              <span>Continue scrolling</span>
+              <span className="grid h-7 w-4 place-items-center rounded-full border border-white/20">
+                <span className="h-1.5 w-0.5 rounded-full bg-white/60 animate-bounce" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --background: 8 11 16;
+  --foreground: 245 245 247;
+  
+  /* Classic Suit Theme (Refined: Deep Navy / White / Crimson, blue as ambient) */
+  --theme-bg: #080b10;
+  --theme-surface: rgba(255, 255, 255, 0.035);
+  --suit-accent: #e50914;
+  --suit-accent-rgb: 229, 9, 20;
+  --suit-accent-ink: #ffffff;
+  --suit-secondary: #4c8dff;
+  --suit-secondary-rgb: 76, 141, 255;
+  --suit-web: #4c8dff;
+  --suit-gold: #d9a845;
+  --suit-panel: rgba(255, 255, 255, 0.035);
+  --suit-border: rgba(255, 255, 255, 0.08);
+  --suit-glow: rgba(229, 9, 20, 0.10);
+  --suit-success: #34d399;
+
+  --font-display-theme: "Space Grotesk", "Inter Tight", "General Sans", sans-serif;
+  --font-mono-theme: "JetBrains Mono", monospace;
+  --font-display-aggressive: var(--font-anton);
+  --font-comic-theme: var(--font-bangers);
+  --font-creep-theme: var(--font-anton);
+
+
+  --spotlight-x: 50%;
+  --spotlight-y: 20%;
+}
+
+/* Venom Mode Custom Property Overrides — True Black / Silver-White Metallic Symbiote */
+[data-theme-mode="venom"] {
+  --theme-bg: #000000;
+  --theme-surface: rgba(255, 255, 255, 0.035);
+  --suit-accent: #ffffff;
+  --suit-accent-rgb: 255, 255, 255;
+  --suit-accent-ink: #050505;
+  --suit-secondary: #c7cbd1;
+  --suit-secondary-rgb: 199, 203, 209;
+  --suit-web: #c7cbd1;
+  --suit-gold: #ffffff;
+  --suit-panel: rgba(255, 255, 255, 0.035);
+  --suit-border: rgba(255, 255, 255, 0.08);
+  --suit-glow: rgba(220, 225, 230, 0.12);
+  --suit-success: #c7cbd1;
+  --font-display-theme: var(--font-anton);
+  --font-display-aggressive: var(--font-anton);
+  --font-comic-theme: var(--font-anton);
+  --font-mono-theme: "JetBrains Mono", monospace;
+}
+
+/* Classic Mode — Deep Navy / Crimson Webhead */
+[data-theme-mode="classic"] {
+  --font-display-theme: var(--font-bangers);
+  --font-display-aggressive: var(--font-bangers);
+  --font-comic-theme: var(--font-bangers);
+  --font-mono-theme: "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  cursor: default;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--theme-bg);
+  color: rgb(var(--foreground));
+  font-family: var(--font-sans), "Inter Tight", system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  transition: background-color 400ms ease;
+}
+
+::selection {
+  background: var(--suit-accent);
+  color: var(--suit-accent-ink);
+}
+
+/* Web Lattice Background */
+.web-background {
+  background-color: var(--theme-bg);
+}
+
+.web-grid-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.04) 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+.hud-glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(40px) saturate(1.4);
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.hud-glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.text-glow {
+  text-shadow: 0 0 40px rgba(var(--suit-accent-rgb), 0.12);
+}
+
+.web-text-glow {
+  text-shadow: 0 0 30px rgba(var(--suit-accent-rgb), 0.08);
+}
+
+.premium-heading {
+  font-family: var(--font-display-theme);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+}
+
+/* Venom Mode Chromatic Aberration Text Glitch Effect */
+[data-theme-mode="venom"] .venom-glitch-text {
+  position: relative;
+  display: inline-block;
+  animation: venomIdle 3.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+@keyframes venomIdle {
+  0%, 91%, 100% { transform: translate(0, 0); }
+  92% { transform: translate(-2px, 1px); }
+  93% { transform: translate(2px, -1px); }
+  94% { transform: translate(-1px, -1px); }
+  96% { transform: translate(1px, 2px); }
+  97% { transform: translate(0, 0); }
+}
+
+[data-theme-mode="venom"] .venom-glitch-text:hover::before,
+[data-theme-mode="venom"] .venom-glitch-text:hover::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+[data-theme-mode="venom"] .venom-glitch-text:hover::before {
+  left: -3px;
+  color: #9ca3af;
+  text-shadow: 3px 0 #9ca3af;
+  animation: venomGlitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+[data-theme-mode="venom"] .venom-glitch-text:hover::after {
+  left: 3px;
+  color: #ffffff;
+  text-shadow: -3px 0 #ffffff;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  animation: venomGlitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse infinite;
+}
+
+@keyframes venomGlitch {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Classic Mode — Comic Book Offset Duotone */
+[data-theme-mode="classic"] .classic-pop-title {
+  position: relative;
+  display: inline-block;
+  color: #ffffff;
+  text-shadow:
+    3px 3px 0 #e50914,
+    6px 6px 0 rgba(0, 162, 255, 0.55);
+  transition: text-shadow 300ms ease;
+}
+
+[data-theme-mode="classic"] .classic-pop-title:hover {
+  text-shadow:
+    -3px -3px 0 #00a2ff,
+    -6px -6px 0 rgba(229, 9, 20, 0.55);
+}
+
+a,
+button {
+  cursor: pointer;
+  transition: transform 250ms ease, opacity 250ms ease, box-shadow 250ms ease, color 250ms ease, background-color 250ms ease;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--suit-web);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  html {
+    cursor: auto;
+  }
+
+  a,
+  button {
+    cursor: pointer;
+  }
+}
+
+/* Hide native cursor only while the custom spider cursor is active (fine pointer, motion ok). */
+html.spider-cursor-active,
+html.spider-cursor-active * {
+  cursor: none !important;
+}
+
+/* Inside the resume PDF iframe the browser owns the pointer — let it work. */
+html.spider-cursor-active iframe,
+html.spider-cursor-active iframe * {
+  cursor: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
