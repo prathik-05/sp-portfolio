@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSPDev } from "@/context/spdev-provider";
 import { cn } from "@/lib/utils";
 
@@ -243,17 +244,17 @@ export function SpiderCursor() {
     return null;
   }
 
-  return (
+  return createPortal(
     <>
       {/* Web trail + click burst canvas */}
-      <canvas ref={canvasRef} className="pointer-events-none fixed inset-0 z-[99999999]" />
+      <canvas ref={canvasRef} className="pointer-events-none fixed inset-0 z-[999999999]" />
 
       {/* Tiny web connection shown while hovering interactive elements */}
       <div
         ref={webRef}
         aria-hidden
         className={cn(
-          "pointer-events-none fixed left-0 top-0 z-[9999999] transition-opacity duration-200",
+          "pointer-events-none fixed left-0 top-0 z-[999999999] transition-opacity duration-200",
           hovering ? "opacity-70" : "opacity-0"
         )}
       >
@@ -286,7 +287,7 @@ export function SpiderCursor() {
       <div
         ref={spiderRef}
         className={cn(
-          "pointer-events-none fixed left-0 top-0 z-[9999999] will-change-transform transition-[width,height,opacity] duration-200 ease-out",
+          "pointer-events-none fixed left-0 top-0 z-[999999999] will-change-transform transition-[width,height,opacity] duration-200 ease-out",
           hovering ? "h-7 w-7" : "h-5 w-5",
           overIframe && "opacity-0"
         )}
@@ -319,6 +320,7 @@ export function SpiderCursor() {
           <path d="M20 22.5 L25 24.5 L27 28" />
         </svg>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
