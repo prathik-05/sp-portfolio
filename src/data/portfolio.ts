@@ -309,7 +309,7 @@ export const projects: Project[] = [
     github: "https://github.com/prathik-05/MCP-Powered-Video-RAG",
     live: "",
     slug: "mcp-rag-video-intelligence",
-    status: "Prototype / Research Build",
+    status: "Production-Ready AI System",
     image: "/images/hero-suit.jpg",
     tags: ["Python", "Streamlit", "RAG", "MCP", "ChromaDB", "Vector Search"],
     stack: ["Python", "Streamlit", "RAG", "MCP", "Vector Search", "ChromaDB"],
