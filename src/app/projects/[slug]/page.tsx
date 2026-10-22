@@ -67,10 +67,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <Github className="h-4 w-4" />
               GitHub
             </a>
-            <a href={project.live || project.repo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-bold text-white">
-              <ExternalLink className="h-4 w-4" />
-              Preview
-            </a>
+            {project.live ? (<a href={project.live} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-bold text-white"><ExternalLink className="h-4 w-4" />Live Demo</a>) : null}
           </div>
         </div>
 

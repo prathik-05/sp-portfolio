@@ -431,21 +431,13 @@ export default function TicTacToeCaseStudyPage() {
         <div className="pt-8 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 font-mono text-xs">
           <div className="flex flex-wrap items-center gap-3">
             <a
-              href={project?.repo || "https://github.com/prathik-05/tic-tac-toe-minimax"}
+              href={project?.repo || "https://github.com/prathik-05/Tic-Tac-Toe-with-Minimax-AI"}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-[var(--suit-accent)] px-8 py-3.5 font-bold uppercase text-[var(--suit-accent-ink)] transition hover:scale-105 shadow-md shadow-[var(--suit-glow)]"
             >
               <Code2 className="h-4 w-4" />
               <span>VIEW SOURCE ON GITHUB</span>
-            </a>
-            <a
-              href={project?.live || project?.repo || "https://github.com/prathik-05/tic-tac-toe-minimax"}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3.5 font-bold text-white transition hover:bg-white/20"
-            >
-              <span>PREVIEW</span>
             </a>
           </div>
 
