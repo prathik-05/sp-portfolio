@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { BadgeCheck, ShieldQuestion, ChevronRight, Shield } from "lucide-react";
+import { BadgeCheck, ChevronRight, Shield } from "lucide-react";
 import type { Certification } from "@/data/certifications";
 import { useSPDev } from "@/context/spdev-provider";
 
@@ -14,7 +14,6 @@ interface CertCardProps {
 
 export function CertCard({ certification, index, onOpen }: CertCardProps) {
   const { reducedMotion } = useSPDev();
-  const verified = certification.verificationStatus === "verified";
 
   return (
     <motion.div
@@ -57,17 +56,21 @@ export function CertCard({ certification, index, onOpen }: CertCardProps) {
         <div className="flex items-center justify-between border-t border-white/6 pt-3 text-xs">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-medium ${
-              verified
+              certification.verificationUrl
                 ? "border-[var(--suit-success)]/30 bg-[var(--suit-success)]/10 text-[var(--suit-success)]"
                 : "border-white/10 bg-white/[0.03] text-slate-300"
             }`}
           >
-            {verified ? (
+            {certification.verificationUrl ? (
               <BadgeCheck className="h-3.5 w-3.5" />
             ) : (
-              <ShieldQuestion className="h-3.5 w-3.5" />
+              <Shield className="h-3.5 w-3.5 text-[var(--suit-accent)]" />
             )}
-            {verified ? "Verified Credential" : "Academy Certificate"}
+            {certification.verificationUrl
+              ? "Verified Credential"
+              : certification.credentialId
+              ? "Credential ID"
+              : "Coursework Completed"}
           </span>
 
           <span className="flex items-center gap-1 text-[11px] font-mono text-slate-400 group-hover:text-[var(--suit-accent)] transition-colors">

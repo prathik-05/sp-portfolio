@@ -85,7 +85,8 @@ export function PipelineDiagram({ pipeline, onNodeClick, activeIndex = null }: P
                   ? "border-[var(--suit-accent)]/50 bg-[var(--suit-accent)]/[0.06] shadow-[0_0_28px_var(--suit-glow)]"
                   : "hover:border-[var(--suit-accent)]/30 hover:bg-white/[0.04]",
                 isActive && "scale-[1.02]",
-                "focus-visible:outline-2 focus-visible:outline-[var(--suit-web)] focus-visible:outline-offset-2"
+                "focus-visible:outline-2 focus-visible:outline-[var(--suit-web)] focus-visible:outline-offset-2",
+                index === nodes.length - 1 && "sm:col-span-2 xl:col-span-3 2xl:col-span-1"
               )}
             >
               <div className="flex w-full items-center justify-between gap-3">

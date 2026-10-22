@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: "Prathik Salla Portfolio",
     images: [
       {
-        url: "/images/spidey-hero.jpg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Prathik Salla Engineering Portfolio"
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     title: "Prathik Salla — Software Engineer (AI/ML & Systems)",
     description:
       "Software engineering portfolio featuring real-world AI/ML systems, computer vision streaming, and production-oriented architectures.",
-    images: ["/images/spidey-hero.jpg"]
+    images: ["/opengraph-image"]
   },
   robots: {
     index: true,

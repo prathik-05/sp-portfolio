@@ -49,13 +49,11 @@ function HomeContent() {
         data-hero-card
         initial={false}
         animate={{
-          opacity: currentCard === 1 ? 1 : 0,
-          scale: currentCard === 1 ? 1 : 1.05,
-          filter: currentCard === 1 ? "blur(0px)" : "blur(10px)"
+          opacity: currentCard === 1 ? 1 : 0
         }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         style={{ pointerEvents: currentCard === 1 ? "auto" : "none" }}
-        className="fixed inset-0 z-30 overflow-hidden"
+        className="fixed inset-0 z-30 h-dvh w-full overflow-hidden"
         aria-hidden={currentCard !== 1}
       >
         <Hero />

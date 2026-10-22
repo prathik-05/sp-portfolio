@@ -67,7 +67,7 @@ export function CertVerificationPanel({ certification, onClose }: CertVerificati
                   ) : (
                     <ShieldQuestion className="h-4 w-4" />
                   )}
-                  {verified ? "Verified Credential" : "Academy Certificate"}
+                  {certification.verificationUrl ? "Verified Credential" : certification.credentialId ? "Credential ID" : "Academy Certificate"}
                 </dd>
               </div>
 

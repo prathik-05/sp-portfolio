@@ -64,7 +64,7 @@ export function SkillsInteractiveSection() {
                 <div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] font-mono text-slate-300">
                   <ShieldCheck className="h-3.5 w-3.5 text-[var(--suit-accent)]" />
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider">Proof:</span>
-                  <span className="font-semibold text-white truncate max-w-[170px] sm:max-w-[210px]">{cat.proofProject}</span>
+                  <span className="font-semibold text-white whitespace-normal">{cat.proofProject}</span>
                 </div>
               </div>
 

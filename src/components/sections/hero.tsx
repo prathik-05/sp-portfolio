@@ -17,9 +17,9 @@ const SCROLL_RATIO = 0.13;
 
 const ROLES = [
   "Software Engineer — AI/ML",
-  "Multimodal RAG Engineer",
-  "Real-Time Computer Vision Builder",
-  "Backend & Distributed Systems Dev"
+  "Multimodal RAG Systems",
+  "Real-Time Computer Vision (YOLOv11)",
+  "Backend & Distributed Systems"
 ];
 
 function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
@@ -163,7 +163,7 @@ export function Hero() {
   return (
     <section
       ref={rootRef}
-      className="relative h-screen w-full overflow-hidden overscroll-contain bg-[var(--theme-bg)] transition-colors duration-500"
+      className="relative min-h-dvh w-full overflow-hidden overscroll-contain bg-[var(--theme-bg)] transition-colors duration-500"
       style={{ touchAction: "pan-y" }}
     >
       {/* Ambient backdrop */}
@@ -206,30 +206,28 @@ export function Hero() {
         }}
       />
 
-      {/* Scrollable stage: 100vh hero + a ~13vh continuation strip */}
+      {/* Scrollable stage: min-h-dvh hero + a ~13vh continuation strip */}
       <div
         ref={contentRef}
         className="relative z-10 will-change-transform"
         style={{ height: `calc(100% + ${maxScroll}px)` }}
       >
-        {/* Main hero composition */}
-        <div className="flex min-h-screen flex-col justify-center px-6 pt-24 pb-16 sm:px-10 lg:px-16">
-          <div className="mx-auto grid w-full max-w-[1280px] items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+        {/* Main hero composition: reserved pt-[88px] for fixed navbar */}
+        <div className="grid min-h-dvh items-center px-6 pt-[88px] pb-6 sm:px-10 lg:px-16">
+          <div className="mx-auto grid w-full max-w-[1280px] items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
             {/* Left: Editorial identity */}
             <div ref={titleRef} className="will-change-transform">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-8"
+                className="space-y-6 sm:space-y-8"
               >
                 {/* Status line */}
                 <div className="flex items-center gap-2.5">
                   <span className="h-2 w-2 rounded-full bg-[var(--suit-success)]" />
                   <p className="font-mono text-[11px] font-medium tracking-[0.22em] text-slate-300 uppercase">
-                    {themeMode === "venom"
-                      ? "Venom Symbiote Mode // Initialized"
-                      : "Ace Engineering College '27 // Open for Opportunities"}
+                    Ace Engineering College &apos;27 // Software Engineer — AI/ML
                   </p>
                 </div>
 
@@ -237,7 +235,7 @@ export function Hero() {
                 <div className="space-y-4">
                   <h1
                     data-text={`${theme.copy.heroTitleFirst} ${theme.copy.heroTitleLast}`}
-                    className="venom-glitch-text classic-pop-title font-display-aggressive text-[clamp(3.4rem,8.5vw,7.8rem)] font-bold leading-[0.88] tracking-tight text-white"
+                    className="venom-glitch-text classic-pop-title font-display-aggressive text-[clamp(2.8rem,7.5vw,7.2rem)] font-bold leading-[0.88] tracking-tight text-white"
                     style={{ fontFamily: "var(--font-display-aggressive)" }}
                   >
                     {theme.copy.heroTitleFirst}{" "}
@@ -246,21 +244,23 @@ export function Hero() {
                     </span>
                   </h1>
 
-                  {/* Dynamic Rotating Roles */}
-                  <div className="flex items-center gap-3 h-8">
-                    <span className="h-px w-8 bg-[var(--suit-accent)]" />
-                    <AnimatePresence mode="wait">
-                      <motion.p
-                        key={roleIndex}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.3 }}
-                        className="font-mono text-xs sm:text-sm font-bold tracking-[0.22em] text-slate-200 uppercase"
-                      >
-                        {ROLES[roleIndex]}
-                      </motion.p>
-                    </AnimatePresence>
+                  {/* Dynamic Rotating Roles with fixed line-box */}
+                  <div className="flex items-center gap-3">
+                    <span className="h-px w-8 shrink-0 bg-[var(--suit-accent)]" />
+                    <div className="relative h-8 leading-8 overflow-hidden w-full max-w-xl">
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={roleIndex}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute inset-y-0 left-0 flex items-center font-mono text-xs sm:text-sm font-bold tracking-[0.16em] sm:tracking-[0.22em] text-slate-200 uppercase whitespace-nowrap"
+                        >
+                          {ROLES[roleIndex]}
+                        </motion.p>
+                      </AnimatePresence>
+                    </div>
                   </div>
 
                   <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base font-sans">
@@ -269,7 +269,7 @@ export function Hero() {
                 </div>
 
                 {/* CTA group */}
-                <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center">
+                <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center">
                   <button
                     onClick={handleUnlockClick}
                     aria-label="View Full Portfolio"
@@ -292,7 +292,7 @@ export function Hero() {
               </motion.div>
             </div>
 
-            {/* Right: Cinematic showcase panel */}
+            {/* Right: Cinematic showcase panel sized dynamically from viewport */}
             <motion.div
               ref={imageRef}
               initial={{ opacity: 0, scale: 0.97 }}
@@ -302,9 +302,9 @@ export function Hero() {
                 ease: [0.16, 1, 0.3, 1],
                 delay: 0.15
               }}
-              className="relative will-change-transform"
+              className="relative will-change-transform flex justify-center"
             >
-              <div className="relative mx-auto w-full max-w-[460px]">
+              <div className="relative w-full max-w-[460px] flex justify-center">
                 {/* Atmospheric glow */}
                 <div
                   aria-hidden
@@ -347,7 +347,8 @@ export function Hero() {
                     <path d="M2 22 L22 2 M6 22 L22 6 M10 22 L22 10 M14 22 L22 14 M2 18 L18 2 M2 14 L14 2" />
                   </svg>
 
-                  <div className="relative aspect-[4/5] min-h-[440px] sm:min-h-[480px] w-full overflow-hidden rounded-[1.5rem]">
+                  {/* Responsive card sized from viewport: max 72dvh, maintains 3/4 aspect */}
+                  <div className="relative h-[min(72dvh,620px)] aspect-[3/4] max-w-full overflow-hidden rounded-[1.5rem]">
                     <Image
                       src={themeMode === "venom" ? "/images/v.jpg" : "/images/spchest.jpg"}
                       alt="Hero showcase"
@@ -367,14 +368,14 @@ export function Hero() {
                       <span className="text-slate-300">B.Tech &apos;27</span>
                     </div>
 
-                    <div className="absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-black/90 to-transparent pointer-events-none" />
+                    <div className="absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-black/90 to-transparent pointer-events-none" />
 
                     {/* Single Clean Character Quote */}
-                    <div className="absolute bottom-5 left-5 right-5 z-10 space-y-1">
-                      <p className="text-sm italic leading-snug text-slate-200">
+                    <div className="absolute bottom-4 left-4 right-4 z-10 space-y-1">
+                      <p className="text-xs sm:text-sm italic leading-snug text-slate-200">
                         &ldquo;{theme.copy.heroQuote}&rdquo;
                       </p>
-                      <p className="text-xs font-semibold tracking-wide text-[var(--suit-accent)]">
+                      <p className="text-[11px] sm:text-xs font-semibold tracking-wide text-[var(--suit-accent)]">
                         — {theme.copy.heroQuoteAuthor}
                       </p>
                     </div>
@@ -422,7 +423,7 @@ export function Hero() {
                   <CountUp value={certifications.length} suffix="+" />
                 </p>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                  Verified Credentials
+                  Credentials & Badges
                 </p>
               </div>
             </div>

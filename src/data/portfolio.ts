@@ -302,7 +302,7 @@ export const projects: Project[] = [
     category: "AI Video Intelligence",
     filterCategory: "AI",
     description:
-      "Engineered an agentic video RAG system using Python, Streamlit, and ChromaDB that indexes multi-hour video transcripts and visual keyframes, delivering sub-200ms semantic search with 100% timestamp-grounded clip retrieval across YouTube and local media.",
+      "Engineered an agentic video RAG system using Python, Streamlit, and ChromaDB that indexes multi-hour video transcripts and visual keyframes, delivering sub-180ms semantic search with sub-second timestamp alignment across YouTube and local media.",
     repo: "https://github.com/prathik-05/MCP-Powered-Video-RAG",
     github: "https://github.com/prathik-05/MCP-Powered-Video-RAG",
     live: "",
@@ -314,7 +314,7 @@ export const projects: Project[] = [
     metrics: {
       latency: "< 180ms Search Latency",
       throughput: "50+ Video Chunks / Query",
-      accuracy: "100% Timestamp Grounding"
+      accuracy: "±0.5s Timestamp Precision"
     },
     architecture: ["Video Input", "Whisper OCR", "ChromaDB Index", "LLM Grounding", "MCP Client"],
     caseStudy: {
@@ -413,7 +413,7 @@ export const projects: Project[] = [
     stack: ["Python", "Streamlit", "Pandas", "Scikit-learn", "Statistical Profiling"],
     metrics: {
       latency: "< 2.2s for 50k+ Rows",
-      throughput: "100% Automated Profiling",
+      throughput: "Single-Pass Schema Audit",
       accuracy: "0-100 Health Score Index"
     },
     architecture: ["CSV Dataset In", "Data Profiling Hub", "Correlation Matrix", "Health Scoring", "Dashboard Out"],
@@ -452,7 +452,7 @@ export const projects: Project[] = [
     category: "Backend / SDE",
     filterCategory: "Backend",
     description:
-      "Developed a layered Spring Boot 3 enterprise REST service with Spring Data JPA and MySQL, featuring Bean Validation, RFC 7807 global exception handling, pagination/sorting, and a 100% test-passing Mockito unit test suite with sub-15ms p95 response times.",
+      "Developed a layered Spring Boot 3 enterprise REST service with Spring Data JPA and MySQL, featuring Bean Validation, RFC 7807 global exception handling, pagination/sorting, and an 18-test Mockito unit test suite with sub-15ms p95 response times.",
     repo: "https://github.com/prathik-05/employee-management-rest-api",
     github: "https://github.com/prathik-05/employee-management-rest-api",
     live: "",
@@ -464,7 +464,7 @@ export const projects: Project[] = [
     metrics: {
       latency: "< 15ms p95 Endpoint Response",
       throughput: "Zero-N+1 JPA Queries",
-      accuracy: "100% Test Suite Pass Rate"
+      accuracy: "18 Passing Unit Tests"
     },
     architecture: ["Client Request", "Controller Layer", "Service Layer", "Repository (JPA)", "MySQL Database"],
     caseStudy: {
@@ -479,7 +479,7 @@ export const projects: Project[] = [
       results: [
         "Sub-15ms p95 response times across indexed MySQL queries.",
         "Every endpoint returns consistent, well-formed JSON responses with proper HTTP status codes.",
-        "Unit tests cover 100% of the service layer, validating strict separation of concerns."
+        "Unit tests cover the complete service layer, validating strict separation of concerns."
       ],
       lessons: [
         "Layered architecture makes a REST API maintainable and is the first thing senior engineers look for.",
