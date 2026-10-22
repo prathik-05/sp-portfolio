@@ -14,49 +14,55 @@ const bangers = Bangers({ subsets: ["latin"], weight: "400", variable: "--font-b
 const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-anton", preload: true });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", preload: true });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sp-portfolio.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://prathik-05.vercel.app"),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "Prathik Salla",
+    default: "Prathik Salla — Software Engineer (AI/ML & Systems)",
     template: "%s | Prathik Salla"
   },
   description:
-    "Portfolio of Prathik Salla, a Software Engineer specializing in AI/ML, Agentic RAG architectures, computer vision pipelines, and scalable backend applications.",
+    "Engineering portfolio of Prathik Salla, specializing in AI/ML architectures, agentic video RAG, real-time computer vision pipelines, and production backend systems.",
   keywords: [
     "Prathik Salla",
     "Software Engineer",
     "AI/ML Engineer",
     "Machine Learning",
     "Computer Vision",
+    "YOLOv11",
     "RAG",
     "Python",
+    "Java",
+    "Spring Boot",
+    "Streamlit",
     "Next.js",
     "Portfolio"
   ],
   authors: [{ name: "Prathik Salla", url: "https://github.com/prathik-05" }],
   creator: "Prathik Salla",
   openGraph: {
-    title: "Prathik Salla",
+    title: "Prathik Salla — Software Engineer (AI/ML & Systems)",
     description:
-      "Modern portfolio showcasing AI/ML applications, RAG video intelligence, computer vision pipelines, and curated certifications.",
-    url: "https://prathik-05.vercel.app",
+      "Engineering portfolio showcasing agentic RAG video intelligence, real-time YOLOv11 streaming vision pipelines, automated dataset intelligence, and verified systems.",
+    url: siteUrl,
     siteName: "Prathik Salla Portfolio",
     images: [
       {
         url: "/images/spidey-hero.jpg",
         width: 1200,
         height: 630,
-        alt: "Prathik Salla Software Engineer Portfolio"
+        alt: "Prathik Salla Engineering Portfolio"
       }
     ],
-    locale: "en_IN",
+    locale: "en_US",
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Prathik Salla",
+    title: "Prathik Salla — Software Engineer (AI/ML & Systems)",
     description:
-      "Software engineering portfolio featuring real-world AI/ML systems and production-oriented architectures.",
+      "Software engineering portfolio featuring real-world AI/ML systems, computer vision streaming, and production-oriented architectures.",
     images: ["/images/spidey-hero.jpg"]
   },
   robots: {
@@ -78,8 +84,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${sans.variable} ${display.variable} ${bangers.variable} ${anton.variable} ${mono.variable}`}>
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="antialiased selection:bg-red-600 selection:text-white">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

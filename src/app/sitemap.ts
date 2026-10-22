@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { projects } from "@/data/portfolio";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://prathik-05.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sp-portfolio.vercel.app";
   const lastModified = new Date();
 
   const projectEntries: MetadataRoute.Sitemap = projects.map((project) => ({

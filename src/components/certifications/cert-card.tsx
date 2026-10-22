@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { BadgeCheck, ShieldQuestion, ChevronRight } from "lucide-react";
+import { BadgeCheck, ShieldQuestion, ChevronRight, Shield } from "lucide-react";
 import type { Certification } from "@/data/certifications";
 import { useSPDev } from "@/context/spdev-provider";
 
@@ -29,21 +29,32 @@ export function CertCard({ certification, index, onOpen }: CertCardProps) {
         onClick={() => onOpen(certification)}
         aria-haspopup="dialog"
         aria-label={`Open ${certification.title} details`}
-        className="group relative flex h-full w-full flex-col justify-between gap-5 rounded-2xl border border-white/8 bg-white/[0.02] p-5 text-left backdrop-blur-md transition-all duration-300 hover:border-white/20 hover:bg-white/[0.04] focus-visible:outline-2 focus-visible:outline-[var(--suit-web)] focus-visible:outline-offset-2"
+        className="group relative flex h-full w-full flex-col justify-between gap-4 rounded-2xl border border-white/8 bg-white/[0.025] p-5 text-left backdrop-blur-md transition-all duration-300 hover:border-white/25 hover:bg-white/[0.05] focus-visible:outline-2 focus-visible:outline-[var(--suit-web)] focus-visible:outline-offset-2"
       >
-        <div className="space-y-3">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
-            {certification.issuer}
-          </p>
-          <h3 className="text-sm font-semibold leading-snug text-white">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-[var(--suit-accent)] font-semibold">
+              {certification.issuer}
+            </p>
+            <span className="font-mono text-[10px] text-slate-400">
+              {certification.yearIssued}
+            </span>
+          </div>
+
+          <h3 className="text-sm font-semibold leading-snug text-white group-hover:text-white">
             {certification.title}
           </h3>
+
+          {certification.credentialId && (
+            <p className="font-mono text-[10px] text-slate-400 flex items-center gap-1 pt-1 truncate">
+              <Shield className="h-3 w-3 text-[var(--suit-accent)] shrink-0" />
+              <span className="text-slate-500">ID:</span>
+              <span className="text-slate-300 truncate">{certification.credentialId}</span>
+            </p>
+          )}
         </div>
 
         <div className="flex items-center justify-between border-t border-white/6 pt-3 text-xs">
-          <span className="font-mono text-slate-400">
-            {certification.yearIssued ?? "Not provided"}
-          </span>
           <span
             className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-medium ${
               verified
@@ -52,17 +63,17 @@ export function CertCard({ certification, index, onOpen }: CertCardProps) {
             }`}
           >
             {verified ? (
-              <BadgeCheck className="h-3 w-3" />
+              <BadgeCheck className="h-3.5 w-3.5" />
             ) : (
-              <ShieldQuestion className="h-3 w-3" />
+              <ShieldQuestion className="h-3.5 w-3.5" />
             )}
-            {verified ? "Verified" : "Self-reported"}
+            {verified ? "Verified Credential" : "Academy Certificate"}
+          </span>
+
+          <span className="flex items-center gap-1 text-[11px] font-mono text-slate-400 group-hover:text-[var(--suit-accent)] transition-colors">
+            Details <ChevronRight className="h-3.5 w-3.5" />
           </span>
         </div>
-
-        <span className="pointer-events-none absolute bottom-4 right-4 hidden text-slate-500 transition-colors group-hover:text-[var(--suit-accent)] sm:inline-flex">
-          <ChevronRight className="h-4 w-4" />
-        </span>
       </button>
     </motion.div>
   );

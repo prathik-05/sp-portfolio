@@ -4,11 +4,11 @@ import React from "react";
 import { motion } from "framer-motion";
 import {
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  ShieldCheck
 } from "lucide-react";
 import {
   skills,
-  skillLevels,
   experiences
 } from "@/data/portfolio";
 import { useSPDev } from "@/context/spdev-provider";
@@ -26,12 +26,12 @@ export function SkillsInteractiveSection() {
       <SectionHeading
         align="center"
         code="03"
-        eyebrow={isVenom ? "ARSENAL" : "SKILLS"}
+        eyebrow={isVenom ? "ARSENAL" : "SKILLS & EXPERIENCE"}
         title={theme.copy.skillsTitle}
-        description="Core engineering proficiencies across AI/ML systems, programming languages, backend frameworks, and cloud platforms."
+        description="Core technical capabilities grouped by domain, backed by demonstrable open-source implementations and verified benchmarks."
       />
 
-      {/* Clean Recruiter-Standard Categories Grid */}
+      {/* Clean Recruiter-Standard Categories Grid — NO ARBITRARY PERCENTAGE BARS */}
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-2">
         {skills.map((cat, catIdx) => {
           const CatIcon = cat.icon;
@@ -47,9 +47,9 @@ export function SkillsInteractiveSection() {
               }`}
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-white/8 pb-4 mb-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/8 pb-4 mb-5">
                 <div className="flex items-center gap-3.5">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--suit-accent)]/15 border border-[var(--suit-accent)]/30 text-[var(--suit-accent)] transition-transform duration-300 group-hover:scale-105">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--suit-accent)]/15 border border-[var(--suit-accent)]/30 text-[var(--suit-accent)] transition-transform duration-300 group-hover:scale-105">
                     <CatIcon className="h-5 w-5" />
                   </div>
                   <div>
@@ -59,44 +59,39 @@ export function SkillsInteractiveSection() {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="font-mono text-base font-bold text-[var(--suit-accent)]">
-                    {cat.level}%
-                  </span>
-                  <p className="text-[10px] font-mono text-slate-500">proficiency</p>
+
+                {/* Practical Proof Badge */}
+                <div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] font-mono text-slate-300">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[var(--suit-accent)]" />
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider">Proof:</span>
+                  <span className="font-semibold text-white truncate max-w-[170px] sm:max-w-[210px]">{cat.proofProject}</span>
                 </div>
               </div>
 
-              {/* Minimal Progress Bar */}
-              <div className="mb-5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                <motion.div
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${cat.level}%` }}
-                  viewport={{ once: true, margin: "-30px" }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                  className="h-full rounded-full bg-gradient-to-r from-[var(--suit-accent)]/60 to-[var(--suit-accent)] shadow-[0_0_10px_var(--suit-glow)]"
-                />
-              </div>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                {cat.description}
+              </p>
 
-              {/* Tag Chips */}
+              {/* Tag Chips with Practical Application Proofs */}
               <div className="flex flex-wrap gap-2">
-                {cat.items.map((item, idx) => {
-                  const level = skillLevels[item] ?? cat.level;
-                  return (
-                    <motion.span
-                      key={item}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true, margin: "-20px" }}
-                      transition={{ duration: 0.25, delay: idx * 0.03 }}
-                      title={`${item} · ${level}%`}
-                      className="group/skill inline-flex items-center gap-1.5 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-slate-300 transition-all duration-200 hover:border-[var(--suit-accent)]/40 hover:text-white hover:bg-[var(--suit-accent)]/10"
-                    >
-                      <span className="h-1 w-1 rounded-full bg-[var(--suit-accent)]/60 group-hover/skill:bg-[var(--suit-accent)]" />
-                      {item}
-                    </motion.span>
-                  );
-                })}
+                {cat.items.map((item, idx) => (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true, margin: "-20px" }}
+                    transition={{ duration: 0.25, delay: idx * 0.03 }}
+                    className="group/skill inline-flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2 text-xs font-medium text-slate-300 transition-all duration-200 hover:border-[var(--suit-accent)]/40 hover:text-white hover:bg-[var(--suit-accent)]/10"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--suit-accent)]/70 group-hover/skill:bg-[var(--suit-accent)]" />
+                    <span className="font-semibold text-slate-200">{item.name}</span>
+                    {item.proof && (
+                      <span className="hidden sm:inline text-[10px] font-mono text-slate-500 border-l border-white/10 pl-1.5 group-hover/skill:text-slate-400">
+                        {item.proof}
+                      </span>
+                    )}
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
           );
@@ -106,10 +101,10 @@ export function SkillsInteractiveSection() {
       {/* Clean Recruiter Summary Strip */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: "Languages", value: "Java · Python · SQL", detail: "HTML/CSS · JS · R" },
-          { label: "Core CS", value: "DSA · OOP · DBMS", detail: "Algorithmic Problem Solving" },
-          { label: "AI / ML & Libraries", value: "RAG · YOLO · PyTorch", detail: "OpenCV · Pandas · Streamlit" },
-          { label: "Cloud & Tooling", value: "Git · OCI · GCP · MCP", detail: "Linux & REST APIs" }
+          { label: "Core Languages", value: "Java · Python · SQL", detail: "JavaScript · R · HTML/CSS" },
+          { label: "Computer Science", value: "DSA · OOP · DBMS", detail: "47 Passing Tests · Algorithmic" },
+          { label: "AI & Vision", value: "RAG · YOLOv11 · PyTorch", detail: "Streamlit · OpenCV · ChromaDB" },
+          { label: "Cloud & Tooling", value: "Git · OCI · GCP · MCP", detail: "Spring Boot · REST APIs · JUnit" }
         ].map((stat, idx) => (
           <motion.div
             key={stat.label}
@@ -136,7 +131,7 @@ export function SkillsInteractiveSection() {
             <h3 className="text-xl font-bold text-white tracking-tight">
               {theme.copy.timelineTitle}
             </h3>
-            <p className="text-xs font-mono text-slate-400">Career Operations Log</p>
+            <p className="text-xs font-mono text-slate-400">Engineering Work History & Internships</p>
           </div>
         </div>
 

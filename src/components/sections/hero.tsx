@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, FileText } from "lucide-react";
 import { THEMES } from "@/lib/themes";
 import { useSPDev } from "@/context/spdev-provider";
@@ -15,16 +15,20 @@ import { cn } from "@/lib/utils";
 /** Bounded internal scroll range for Card 1 (~13vh of physical depth). */
 const SCROLL_RATIO = 0.13;
 
+const ROLES = [
+  "Software Engineer — AI/ML",
+  "Multimodal RAG Engineer",
+  "Real-Time Computer Vision Builder",
+  "Backend & Distributed Systems Dev"
+];
+
 function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    if (!inView) return;
     let raf = 0;
     const start = performance.now();
-    const duration = 900;
+    const duration = 1200;
     const tick = (now: number) => {
       const p = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3);
@@ -33,10 +37,10 @@ function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [inView, value]);
+  }, [value]);
 
   return (
-    <span ref={ref}>
+    <span>
       {String(display).padStart(2, "0")}
       {suffix}
     </span>
@@ -50,6 +54,15 @@ export function Hero() {
   const theme = THEMES[themeMode];
   const isVenom = themeMode === "venom";
 
+  const [roleIndex, setRoleIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRoleIndex((prev) => (prev + 1) % ROLES.length);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
+
   const rootRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const bgRef = useRef<HTMLDivElement | null>(null);
@@ -62,7 +75,6 @@ export function Hero() {
 
   const [maxScroll, setMaxScroll] = useState(0);
 
-  // Measure the bounded scroll range once, and again on resize.
   useEffect(() => {
     const measure = () => setMaxScroll(Math.round(window.innerHeight * SCROLL_RATIO));
     measure();
@@ -70,8 +82,6 @@ export function Hero() {
     return () => window.removeEventListener("resize", measure);
   }, []);
 
-  // Internal, self-contained scroll: Lenis is stopped on Card 1 (it calls
-  // preventDefault), so we drive the movement ourselves via wheel/touch.
   useEffect(() => {
     if (reducedMotion || currentCard !== 1) {
       targetRef.current = 0;
@@ -102,9 +112,7 @@ export function Hero() {
       targetRef.current = clamp(touchStartTarget + dy, 0, maxScroll);
     };
 
-    const onTouchEnd = () => {
-      // Nothing to do — spring is handled by the lerp loop below.
-    };
+    const onTouchEnd = () => {};
 
     root.addEventListener("wheel", onWheel, { passive: false });
     root.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -129,17 +137,13 @@ export function Hero() {
     };
   }, [reducedMotion, currentCard, maxScroll]);
 
-  // Apply the bounded offset plus per-layer parallax via direct style writes.
   const applyTransforms = (c: number) => {
     if (contentRef.current) {
       contentRef.current.style.transform = `translate3d(0, ${-c}px, 0)`;
     }
-    // Background artwork drifts slower than the foreground (0.5x).
     if (bgRef.current) {
       bgRef.current.style.transform = `translate3d(0, ${-c * 0.5}px, 0)`;
     }
-    // Title trails slightly behind (0.82x net), image leads (1.18x net),
-    // stats stay nearly still (0.96x net) — subtle physical depth.
     if (titleRef.current) {
       titleRef.current.style.transform = `translate3d(0, ${c * 0.18}px, 0)`;
     }
@@ -162,7 +166,7 @@ export function Hero() {
       className="relative h-screen w-full overflow-hidden overscroll-contain bg-[var(--theme-bg)] transition-colors duration-500"
       style={{ touchAction: "pan-y" }}
     >
-      {/* Ambient backdrop — drifts slower than content (0.5x parallax). */}
+      {/* Ambient backdrop */}
       <div ref={bgRef} className="absolute inset-0 z-0 will-change-transform">
         <Image
           src={themeMode === "venom" ? "/images/venom.jpg" : "/images/spp.jpg"}
@@ -183,7 +187,6 @@ export function Hero() {
               : "bg-gradient-to-b from-black/70 via-black/45 to-black/90"
           )}
         />
-        {/* Atmospheric tint — crimson in Classic, cool silver in Venom. */}
         <div
           className={cn(
             "absolute inset-0 mix-blend-screen",
@@ -194,7 +197,7 @@ export function Hero() {
         />
       </div>
 
-      {/* Soft suit glow pool behind the content (subtle, not dashboard-like). */}
+      {/* Soft suit glow pool */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[68vh] w-[60vw] -translate-x-1/2 -translate-y-1/2 rounded-full"
@@ -203,7 +206,7 @@ export function Hero() {
         }}
       />
 
-      {/* Scrollable stage: 100vh hero + a ~13vh continuation strip. */}
+      {/* Scrollable stage: 100vh hero + a ~13vh continuation strip */}
       <div
         ref={contentRef}
         className="relative z-10 will-change-transform"
@@ -220,21 +223,21 @@ export function Hero() {
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-8"
               >
-                {/* Minimal status line — no boxy chip. */}
+                {/* Status line */}
                 <div className="flex items-center gap-2.5">
                   <span className="h-2 w-2 rounded-full bg-[var(--suit-success)]" />
-                  <p className="font-mono text-[11px] font-medium tracking-[0.22em] text-slate-400 uppercase">
+                  <p className="font-mono text-[11px] font-medium tracking-[0.22em] text-slate-300 uppercase">
                     {themeMode === "venom"
-                      ? "Symbiote protocol // ready"
-                      : "Open for opportunities"}
+                      ? "Venom Symbiote Mode // Initialized"
+                      : "Ace Engineering College '27 // Open for Opportunities"}
                   </p>
                 </div>
 
-                {/* Typography */}
-                <div className="space-y-5">
+                {/* Main Name Heading */}
+                <div className="space-y-4">
                   <h1
                     data-text={`${theme.copy.heroTitleFirst} ${theme.copy.heroTitleLast}`}
-                    className="venom-glitch-text classic-pop-title font-display-aggressive text-[clamp(3.2rem,8vw,7.5rem)] font-bold leading-[0.9] tracking-tight text-white"
+                    className="venom-glitch-text classic-pop-title font-display-aggressive text-[clamp(3.4rem,8.5vw,7.8rem)] font-bold leading-[0.88] tracking-tight text-white"
                     style={{ fontFamily: "var(--font-display-aggressive)" }}
                   >
                     {theme.copy.heroTitleFirst}{" "}
@@ -242,13 +245,25 @@ export function Hero() {
                       {theme.copy.heroTitleLast}
                     </span>
                   </h1>
-                  <div className="flex items-center gap-4">
-                    <span className="h-px w-10 bg-[var(--suit-accent)]/50" />
-                    <p className="font-mono text-xs sm:text-sm font-semibold tracking-[0.24em] text-slate-300 uppercase">
-                      {theme.copy.heroRole}
-                    </p>
+
+                  {/* Dynamic Rotating Roles */}
+                  <div className="flex items-center gap-3 h-8">
+                    <span className="h-px w-8 bg-[var(--suit-accent)]" />
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={roleIndex}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                        className="font-mono text-xs sm:text-sm font-bold tracking-[0.22em] text-slate-200 uppercase"
+                      >
+                        {ROLES[roleIndex]}
+                      </motion.p>
+                    </AnimatePresence>
                   </div>
-                  <p className="max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
+
+                  <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base font-sans">
                     {theme.copy.heroTagline}
                   </p>
                 </div>
@@ -277,7 +292,7 @@ export function Hero() {
               </motion.div>
             </div>
 
-            {/* Right: Cinematic showcase — no rigid dashboard frame. */}
+            {/* Right: Cinematic showcase panel */}
             <motion.div
               ref={imageRef}
               initial={{ opacity: 0, scale: 0.97 }}
@@ -290,7 +305,7 @@ export function Hero() {
               className="relative will-change-transform"
             >
               <div className="relative mx-auto w-full max-w-[460px]">
-                {/* Atmospheric glow bleeding out from the character. */}
+                {/* Atmospheric glow */}
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -inset-10 rounded-full opacity-70 blur-2xl"
@@ -302,9 +317,9 @@ export function Hero() {
                   }}
                 />
 
-                {/* Premium framed panel — generous padding, refined border, corner accents. */}
+                {/* Framed panel */}
                 <div className="relative rounded-[2rem] border border-white/12 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-2.5 shadow-2xl shadow-black/60 backdrop-blur-xl">
-                  {/* Corner web accents */}
+                  {/* Corner accents */}
                   <svg
                     aria-hidden
                     className={cn(
@@ -345,22 +360,22 @@ export function Hero() {
                       )}
                     />
                     {/* Panel header strip */}
-                    <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300 bg-gradient-to-b from-black/60 to-transparent">
-                      <span className="text-[var(--suit-accent)]">
-                        {themeMode === "venom" ? "Symbiote // Black Suit" : "Identity // Core Mark"}
+                    <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300 bg-gradient-to-b from-black/70 to-transparent">
+                      <span className="text-[var(--suit-accent)] font-semibold">
+                        {themeMode === "venom" ? "Venom Protocol" : "Prathik Salla"}
                       </span>
-                      <span className="text-slate-400">v2.5 Ready</span>
+                      <span className="text-slate-300">B.Tech &apos;27</span>
                     </div>
-                    {/* Legibility grade at the base. */}
-                    <div className="absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-black/85 to-transparent pointer-events-none" />
 
-                    {/* Quote caption. */}
-                    <div className="absolute bottom-5 left-5 right-5 z-10 space-y-1.5">
+                    <div className="absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-black/90 to-transparent pointer-events-none" />
+
+                    {/* Single Clean Character Quote */}
+                    <div className="absolute bottom-5 left-5 right-5 z-10 space-y-1">
                       <p className="text-sm italic leading-snug text-slate-200">
                         &ldquo;{theme.copy.heroQuote}&rdquo;
                       </p>
                       <p className="text-xs font-semibold tracking-wide text-[var(--suit-accent)]">
-                        {theme.copy.heroQuoteAuthor}
+                        — {theme.copy.heroQuoteAuthor}
                       </p>
                     </div>
                   </div>
@@ -370,44 +385,51 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Continuation strip — editorial facts + scroll cue. Still Card 1. */}
+        {/* Continuation strip — verified stats row */}
         <div
           ref={statsRef}
           style={{ height: maxScroll }}
           className="flex items-center border-t border-white/6 px-6 sm:px-10 lg:px-16 will-change-transform"
         >
           <div className="mx-auto grid w-full max-w-[1280px] gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
-            {/* Editorial stats row — subtle dividers instead of dashboard boxes. */}
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:divide-x sm:divide-white/10">
               <div className="sm:pr-8">
                 <p className="font-display text-2xl font-bold text-white">
                   <CountUp value={projects.length} />
                 </p>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                  Flagship projects
+                  Flagship Systems
                 </p>
               </div>
               <div className="sm:px-8">
                 <p className="font-display text-2xl font-bold text-[var(--suit-accent)]">
-                  YOLOv11
+                  <CountUp value={45} suffix="+" />
                 </p>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                  Computer vision
+                  FPS YOLOv11 Stream
                 </p>
               </div>
               <div className="sm:px-8">
                 <p className="font-display text-2xl font-bold text-white">
+                  <CountUp value={47} />
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                  Passing Unit Tests
+                </p>
+              </div>
+              <div className="sm:px-8">
+                <p className="font-display text-2xl font-bold text-[var(--suit-accent)]">
                   <CountUp value={certifications.length} suffix="+" />
                 </p>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                  Certifications
+                  Verified Credentials
                 </p>
               </div>
             </div>
 
             {/* Scroll cue */}
             <div className="hidden items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 lg:flex">
-              <span>Continue scrolling</span>
+              <span>Scroll to enter portfolio</span>
               <span className="grid h-7 w-4 place-items-center rounded-full border border-white/20">
                 <span className="h-1.5 w-0.5 rounded-full bg-white/60 animate-bounce" />
               </span>

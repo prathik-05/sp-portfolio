@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { BadgeCheck, ShieldQuestion, ExternalLink, X } from "lucide-react";
+import { BadgeCheck, ShieldQuestion, ExternalLink, X, Shield } from "lucide-react";
 import type { Certification } from "@/data/certifications";
 import { DetailPortal } from "@/components/ui/detail-portal";
 
@@ -25,7 +25,7 @@ export function CertVerificationPanel({ certification, onClose }: CertVerificati
           {/* Header */}
           <div className="flex items-start justify-between gap-4 border-b border-white/10 p-6 sm:p-7">
             <div className="space-y-1.5">
-              <p className="font-mono text-[10px] uppercase tracking-wider text-[var(--suit-accent)]">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-[var(--suit-accent)] font-semibold">
                 {certification.issuer}
               </p>
               <h2 className="font-display text-xl font-bold leading-tight text-white">
@@ -46,10 +46,10 @@ export function CertVerificationPanel({ certification, onClose }: CertVerificati
             <dl className="space-y-3">
               <div className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
                 <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
-                  Issued
+                  Issued Year
                 </dt>
-                <dd className="text-sm font-medium text-white">
-                  {certification.yearIssued ?? "Not provided"}
+                <dd className="text-sm font-medium text-white font-mono">
+                  {certification.yearIssued}
                 </dd>
               </div>
 
@@ -67,16 +67,17 @@ export function CertVerificationPanel({ certification, onClose }: CertVerificati
                   ) : (
                     <ShieldQuestion className="h-4 w-4" />
                   )}
-                  {verified ? "Verified" : "Self-reported"}
+                  {verified ? "Verified Credential" : "Academy Certificate"}
                 </dd>
               </div>
 
               {certification.credentialId ? (
                 <div className="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
-                  <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
-                    Credential ID
+                  <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5 text-[var(--suit-accent)]" />
+                    Reference / Credential ID
                   </dt>
-                  <dd className="mt-1 break-all font-mono text-xs text-[var(--suit-web)]">
+                  <dd className="mt-1.5 break-all font-mono text-xs text-[var(--suit-web)] bg-black/40 p-2 rounded-lg border border-white/6">
                     {certification.credentialId}
                   </dd>
                 </div>
@@ -90,12 +91,16 @@ export function CertVerificationPanel({ certification, onClose }: CertVerificati
                 rel="noopener noreferrer"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--suit-accent)] px-6 py-3.5 font-semibold text-[var(--suit-accent-ink)] transition hover:opacity-95"
               >
-                View Credential
+                View Credential Badge
                 <ExternalLink className="h-4 w-4" />
               </a>
+            ) : certification.credentialId ? (
+              <p className="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-slate-300">
+                Official completion certified under ID <span className="font-mono text-[var(--suit-accent)]">{certification.credentialId}</span>.
+              </p>
             ) : (
               <p className="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-slate-400">
-                No public verification is currently available. This credential is self-reported.
+                Coursework and certificate completed through official training platform.
               </p>
             )}
           </div>

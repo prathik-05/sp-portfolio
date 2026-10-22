@@ -8,6 +8,7 @@ import { WebShooter } from "@/components/effects/web-shooter";
 import { HangingSpider } from "@/components/effects/hanging-spider";
 import { WebCorners } from "@/components/effects/web-corners";
 import { SmoothScroll } from "@/components/effects/smooth-scroll";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { CommandCenter } from "@/components/navigation/command-center";
 import { SystemControlDock } from "@/components/ui/system-control-dock";
 import { CinematicBackdrop } from "@/components/effects/cinema-backdrop";
@@ -34,6 +35,9 @@ function SiteChromeContent({ children }: { children: React.ReactNode }) {
 
   return (
     <main className="web-background relative isolate min-h-screen text-slate-100 transition-colors duration-500">
+      {/* Top Scroll Progress Indicator */}
+      <ScrollProgress />
+
       {/* Background: Classic 2D Backdrop vs Lazy-Loaded Venom 2D Canvas Metaballs */}
       {themeMode === "venom" ? <LazyVenomMetaballs /> : <CinematicBackdrop />}
 
